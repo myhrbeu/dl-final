@@ -1,0 +1,14 @@
+# ignore txt files of data
+txt/*
+
+# ignore misc stuff in etc
+etc/*
+
+# ignore data
+mat/Pilot_S19/*
+
+# ignore zip
+mat/Pilot_S19.zip
+
+# ignore labeled text files
+files16hz/*
