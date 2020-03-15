@@ -1,5 +1,11 @@
 # ignore txt files of data
 txt/*
+data*/
+
+# ignore model outputs
+log/
+model/
+output/
 
 # ignore misc stuff in etc
 etc/*
