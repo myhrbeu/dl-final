@@ -2,13 +2,13 @@ import pandas as pd
 import glob
 import matplotlib.pyplot as plt
 
-NORMED = True
+NORMED = False
 
 # Get data paths (normed or unnormed)
 if NORMED:
     path = '../files16hz/*norm_labelled.csv'
 else:
-    path = '../files16hz/*labelled.csv'
+    path = '../files16hz/*txt_labelled.csv'
 image_path = '../images/dists/'
 paths = glob.glob(path)
 
