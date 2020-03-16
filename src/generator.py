@@ -38,7 +38,7 @@ class DataGenerator(keras.utils.Sequence):
             all_data.append(data)
 
             m = re.search(r"(-?[0-9])_[0-9]+\.npy$", self.filepaths[i])
-            labels.append(m.group(1))
+            labels.append(int(m.group(1)))
         batch_x = np.array(all_data)
         if self.categorical:
             batch_y = keras.utils.to_categorical(labels, num_classes=8, dtype='int8')
