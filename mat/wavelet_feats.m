@@ -95,7 +95,7 @@ for file = used_inds
             wind_inds = labels{file}==RASS_nums(RASS);
             w_temp2 = w_temp(:,wind_inds);
             for col = 1:length(w_temp2(1,:))
-                [peaks,locs,widths,prominences] = findpeaks(abs(w_temp(:,col)));
+                [peaks,locs,widths,prominences] = findpeaks(abs(w_temp2(:,col)));
                 wavelet_RASS{RASS,vm} = vertcat(wavelet_RASS{RASS,vm},[peaks locs widths prominences]);
             end
 %             figure(1)
@@ -111,8 +111,8 @@ for file = used_inds
 %             tit = strcat('RASS ', num2str(RASS_nums(RASS)));
 %             title(tit);
 %             pause(.5)
-            formatspec = '\n wavelet scale peaks for %s, RASS % i loaded \n';
-            fprintf(formatspec,filenames{file},RASS_nums(RASS))
+%             formatspec = '\n wavelet scale peaks for %s, RASS % i loaded \n';
+%             fprintf(formatspec,filenames{file},RASS_nums(RASS))
         end
     end
         
