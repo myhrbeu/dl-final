@@ -18,3 +18,5 @@ mat/Pilot_S19.zip
 
 # ignore labeled text files
 files16hz/*
+
+__pycache__/
