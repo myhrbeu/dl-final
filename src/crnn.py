@@ -15,6 +15,8 @@ import numpy as np
 
 from generator import DataGenerator
 
+from sklearn.metrics import confusion_matrix
+
 
 class SimpleCSVLoggerELR(keras.callbacks.Callback):
     def __init__(self, filename, sched, batch_size):
@@ -163,14 +165,19 @@ def main(args):
     filepaths = np.array(glob.glob(os.path.join(args.data_dir, '*')))
     np.random.shuffle(filepaths)
 
+    if args.quick:
+        filepaths = filepaths[:500]
+
     train_end = int(len(filepaths)*args.train_prop)
     val_n = int(len(filepaths)*args.val_prop)
     val_end = train_end + val_n
-    train_paths, val_paths, test_paths = np.split(filepaths, set([train_end, val_end]))
+    train_paths, val_paths, test_paths = np.split(filepaths, [train_end, val_end])
+    print(train_paths.shape, val_paths.shape, test_paths.shape)
 
-    tr_dg = DataGenerator(train_paths, batch_size=args.batch_size)
-    val_dg = DataGenerator(val_paths, batch_size=args.batch_size)
-    te_dg = DataGenerator(test_paths, batch_size=args.batch_size)
+    categorical = args.classify or args.resume_ft == 'class'
+    tr_dg = DataGenerator(train_paths, batch_size=args.batch_size, categorical=categorical)
+    val_dg = DataGenerator(val_paths, batch_size=args.batch_size, categorical=categorical)
+    te_dg = DataGenerator(test_paths, batch_size=args.batch_size, categorical=categorical)
 
     # BUILD MODEL
     logging.info('Constructing model...')
@@ -249,11 +256,26 @@ def main(args):
     score = model.evaluate(te_dg)
     logging.info(f'Score: {score}')
 
-    true = np.array([label for _, label in te_dg]).ravel()
-    pred = model.predict(te_dg).flatten()
-    plt.scatter(true, pred)
-    plt.xlabel('True')
-    plt.ylabel('Pred')
+    true = np.concatenate([label for _, label in te_dg], axis=0)
+    pred = model.predict(te_dg)
+
+    if args.classify or args.resume_ft == 'class':
+        true = np.argmax(true, axis=1).ravel()
+        pred = np.argmax(pred, axis=1).ravel()
+
+        conf_mat = keras.backend.eval(tf.math.confusion_matrix(true, pred))
+        plt.imshow(conf_mat)
+        plt.xticks(np.arange(conf_mat.shape[1]), np.arange(-3, 5))
+        plt.yticks(np.arange(conf_mat.shape[0]), np.arange(-3, 5))
+        for i in range(conf_mat.shape[0]):
+            for j in range(conf_mat.shape[1]):
+                plt.text(j, i, conf_mat[i, j], ha='center', va='center', color='w')
+    else:
+        true = true.ravel()
+        pred = pred.ravel()
+        plt.scatter(true, pred)
+        plt.xlabel('True')
+        plt.ylabel('Pred')
 
     test_filename = args._pathname + '_results.png'
     test_path = os.path.join(args.output_dir or '', test_filename)

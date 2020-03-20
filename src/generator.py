@@ -41,6 +41,7 @@ class DataGenerator(keras.utils.Sequence):
             labels.append(int(m.group(1)))
         batch_x = np.array(all_data)
         if self.categorical:
+            labels = np.array(labels) + 3
             batch_y = keras.utils.to_categorical(labels, num_classes=8, dtype='int8')
         else:
             batch_y = np.array(labels).reshape(-1, 1)
